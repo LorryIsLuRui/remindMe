@@ -9,7 +9,8 @@
     </div>
 
     <h1>年纪大了记忆力不好？总是忘记要做的事？拖延症越来越严重？欢迎Remind Me，一款老年人必备且必置顶的小程序</h1>
-    <a href="../index/main" class="start">Start</a>
+    <button v-if="showLoginBtn" open-type="getUserInfo" @getuserinfo="getUserInfo">Start</button>
+    <a v-if="!showLoginBtn" href="../index/main" class="start">Start</a>
   </div>
 </template>
 
@@ -21,8 +22,13 @@ export default {
   data () {
     return {
       motto: 'GO',
-      userInfo: {}
+      userInfo: {},
     }
+  },
+  computed: {
+    showLoginBtn(){
+      return true;
+    },
   },
   // store,
   components: {
@@ -34,18 +40,32 @@ export default {
       const url = '../logs/main'
       wx.navigateTo({ url })
     },
-    getUserInfo () {
+    getUserInfo (e) {
       // 调用登录接口
-      wx.login({
-        success: () => {
-          wx.getUserInfo({
-            success: (res) => {
-              this.userInfo = res.userInfo;
-              this.$store.commit('setUserInfo',res.userInfo);
-            }
-          })
-        }
-      })
+      const url = '../index/main'
+      if(!this.$store.state.userinfo && e.mp.detail.userInfo){
+        console.log(e.mp.detail);
+        this.userInfo = e.mp.detail.userInfo;
+        this.$store.commit('setUserInfo',this.userInfo);
+        wx.navigateTo({ url });
+      }
+      // wx.login({
+      //   success: () => {
+      //     wx.getUserInfo({
+      //       success: (res) => {
+      //         console.log(res);
+              //  this.userInfo = res.userInfo;
+              // this.$store.commit('setUserInfo',res.userInfo);
+      //       },
+      //       fail:(err)=>{
+      //         console.log(err);
+      //       }
+      //     })
+      //   },
+      //   fail:(err)=>{
+      //     console.log(err);
+      //   }
+      // })
     },
     clickHandle (msg, ev) {
       // console.log('clickHandle:', msg, ev);
@@ -54,8 +74,13 @@ export default {
   },
 
   created () {
+    if(this.$store.state.userinfo){
+      this.showLoginBtn=false;
+    }else{
+      this.showLoginBtn=true;
+    }
     // 调用应用实例的方法获取全局数据
-    this.getUserInfo()
+    // this.getUserInfo()
   },
   mounted(){
     

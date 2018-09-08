@@ -170,6 +170,7 @@ export default {
         ]
     },
     beforeMount(){
+        console.log(this.$store);
         this.userInfo=this.$store.state.userinfo;
         // console.log(this.$store.state);
     },
